@@ -1,0 +1,13 @@
+2026-11-24 11:55:15,210 INFO début : scenario=panne run=g01-panne02 mode=concurrent concurrence=3 tentatives=4 timeout=1.0s
+2026-11-24 11:55:15,334 INFO page 1 reçue (tentative 1, 4 offres, 122 ms)
+2026-11-24 11:55:15,457 INFO page 3 reçue (tentative 1, 4 offres, 122 ms)
+2026-11-24 11:55:15,458 INFO page 2 reçue (tentative 1, 4 offres, 124 ms)
+2026-11-24 11:55:15,459 INFO page 4 reçue (tentative 1, 4 offres, 124 ms)
+2026-11-24 11:55:15,580 INFO page 5 reçue (tentative 1, 4 offres, 245 ms)
+2026-11-24 11:55:15,580 WARNING page 6 tentative 1 : http_503, reprise dans 0.31 s
+2026-11-24 11:55:16,016 WARNING page 6 tentative 2 : http_503, reprise dans 0.65 s
+2026-11-24 11:55:16,794 WARNING page 6 tentative 3 : http_503, reprise dans 1.27 s
+2026-11-24 11:55:18,186 ERROR page 6 abandonnée après 4 tentatives (http_503)
+2026-11-24 11:55:18,186 ERROR page 6 : http_503 après 4 tentatives
+2026-11-24 11:55:18,187 INFO concurrence maximale observée : 3 requête(s) simultanée(s)
+2026-11-24 11:55:18,187 ERROR LOT NON PUBLIÉ : pages en échec [6] ; valid/ et rejected/ inchangés

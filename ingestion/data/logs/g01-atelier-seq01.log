@@ -1,0 +1,16 @@
+2026-11-24 11:55:18,442 INFO début : scenario=atelier run=g01-atelier-seq01 mode=sequentiel concurrence=1 tentatives=4 timeout=1.0s
+2026-11-24 11:55:18,565 INFO page 1 reçue (tentative 1, 4 offres, 122 ms)
+2026-11-24 11:55:18,687 WARNING page 2 tentative 1 : http_429, reprise dans 1.00 s (Retry-After)
+2026-11-24 11:55:19,814 INFO page 2 reçue (tentative 2, 4 offres, 124 ms)
+2026-11-24 11:55:19,936 WARNING page 3 tentative 1 : json_invalide, reprise dans 0.37 s
+2026-11-24 11:55:20,430 INFO page 3 reçue (tentative 2, 4 offres, 123 ms)
+2026-11-24 11:55:21,432 WARNING page 4 tentative 1 : timeout, reprise dans 0.33 s
+2026-11-24 11:55:21,881 INFO page 4 reçue (tentative 2, 4 offres, 122 ms)
+2026-11-24 11:55:22,007 INFO page 5 reçue (tentative 1, 4 offres, 125 ms)
+2026-11-24 11:55:22,129 INFO page 6 reçue (tentative 1, 4 offres, 122 ms)
+2026-11-24 11:55:22,130 INFO concurrence maximale observée : 1 requête(s) simultanée(s)
+2026-11-24 11:55:22,130 WARNING rejet page 2 position 1 : champ_manquant:supplier_id
+2026-11-24 11:55:22,130 WARNING rejet page 3 position 2 : type_invalide:price_cents
+2026-11-24 11:55:22,130 WARNING rejet page 5 position 1 : produit_inconnu
+2026-11-24 11:55:22,130 WARNING rejet page 6 position 4 : doublon_offer_id:premiere_occurrence_page_1_position_1
+2026-11-24 11:55:22,131 INFO bilan : pages 6/6, requêtes 9, reprises 3, lignes 24 = 20 acceptées + 4 rejetées, 3.687 s

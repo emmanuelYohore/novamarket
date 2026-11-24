@@ -1,0 +1,36 @@
+{
+  "run": "g01-atelier01",
+  "scenario": "atelier",
+  "mode": "concurrent",
+  "concurrence": 3,
+  "statut": "succes",
+  "pages_attendues": 6,
+  "pages_recues": 6,
+  "pages_en_echec": [],
+  "requetes_http": 9,
+  "reprises": 3,
+  "incidents": {
+    "json_invalide": 1,
+    "http_429": 1,
+    "timeout": 1
+  },
+  "lignes_vues": 24,
+  "acceptees": 20,
+  "rejetees": 4,
+  "motifs_rejet": {
+    "champ_manquant": 1,
+    "type_invalide": 1,
+    "produit_inconnu": 1,
+    "doublon_offer_id": 1
+  },
+  "duree_s": 1.595,
+  "publie": true,
+  "fichiers": {
+    "raw": "ingestion/data/raw/g01-atelier01.jsonl",
+    "valid": "ingestion/data/valid/g01-atelier01.jsonl",
+    "rejected": "ingestion/data/rejected/g01-atelier01.jsonl",
+    "publication": "ingestion/data/valid/offres.jsonl"
+  },
+  "concurrence_max_observee": 3,
+  "controle_completude": true
+}

@@ -1,0 +1,9 @@
+2026-11-24 11:55:01,652 INFO début : scenario=clean run=mes-m1-sequentiel-2 mode=sequentiel concurrence=1 tentatives=4 timeout=1.0s
+2026-11-24 11:55:01,775 INFO page 1 reçue (tentative 1, 4 offres, 122 ms)
+2026-11-24 11:55:01,898 INFO page 2 reçue (tentative 1, 4 offres, 122 ms)
+2026-11-24 11:55:02,020 INFO page 3 reçue (tentative 1, 4 offres, 122 ms)
+2026-11-24 11:55:02,142 INFO page 4 reçue (tentative 1, 4 offres, 122 ms)
+2026-11-24 11:55:02,264 INFO page 5 reçue (tentative 1, 4 offres, 122 ms)
+2026-11-24 11:55:02,386 INFO page 6 reçue (tentative 1, 4 offres, 122 ms)
+2026-11-24 11:55:02,387 INFO concurrence maximale observée : 1 requête(s) simultanée(s)
+2026-11-24 11:55:02,388 INFO bilan : pages 6/6, requêtes 6, reprises 0, lignes 24 = 24 acceptées + 0 rejetées, 0.734 s

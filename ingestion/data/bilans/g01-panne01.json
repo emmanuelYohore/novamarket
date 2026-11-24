@@ -1,0 +1,28 @@
+{
+  "run": "g01-panne01",
+  "scenario": "panne",
+  "mode": "concurrent",
+  "concurrence": 3,
+  "statut": "echec_lot_incomplet",
+  "pages_attendues": 6,
+  "pages_recues": 5,
+  "pages_en_echec": [
+    6
+  ],
+  "requetes_http": 9,
+  "reprises": 3,
+  "incidents": {
+    "http_503": 4
+  },
+  "lignes_vues": 20,
+  "acceptees": 0,
+  "rejetees": 0,
+  "motifs_rejet": {},
+  "duree_s": 3.052,
+  "publie": false,
+  "fichiers": {
+    "raw": "ingestion/data/raw/g01-panne01.jsonl"
+  },
+  "concurrence_max_observee": 3,
+  "controle_completude": false
+}

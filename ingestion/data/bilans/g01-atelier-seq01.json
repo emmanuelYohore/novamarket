@@ -1,0 +1,35 @@
+{
+  "run": "g01-atelier-seq01",
+  "scenario": "atelier",
+  "mode": "sequentiel",
+  "concurrence": 1,
+  "statut": "succes",
+  "pages_attendues": 6,
+  "pages_recues": 6,
+  "pages_en_echec": [],
+  "requetes_http": 9,
+  "reprises": 3,
+  "incidents": {
+    "http_429": 1,
+    "json_invalide": 1,
+    "timeout": 1
+  },
+  "lignes_vues": 24,
+  "acceptees": 20,
+  "rejetees": 4,
+  "motifs_rejet": {
+    "champ_manquant": 1,
+    "type_invalide": 1,
+    "produit_inconnu": 1,
+    "doublon_offer_id": 1
+  },
+  "duree_s": 3.687,
+  "publie": false,
+  "fichiers": {
+    "raw": "ingestion/data/raw/g01-atelier-seq01.jsonl",
+    "valid": "ingestion/data/valid/g01-atelier-seq01.jsonl",
+    "rejected": "ingestion/data/rejected/g01-atelier-seq01.jsonl"
+  },
+  "concurrence_max_observee": 1,
+  "controle_completude": true
+}

@@ -1,0 +1,26 @@
+{
+  "run": "g01-clean-conc01",
+  "scenario": "clean",
+  "mode": "concurrent",
+  "concurrence": 3,
+  "statut": "succes",
+  "pages_attendues": 6,
+  "pages_recues": 6,
+  "pages_en_echec": [],
+  "requetes_http": 6,
+  "reprises": 0,
+  "incidents": {},
+  "lignes_vues": 24,
+  "acceptees": 24,
+  "rejetees": 0,
+  "motifs_rejet": {},
+  "duree_s": 0.371,
+  "publie": false,
+  "fichiers": {
+    "raw": "ingestion/data/raw/g01-clean-conc01.jsonl",
+    "valid": "ingestion/data/valid/g01-clean-conc01.jsonl",
+    "rejected": "ingestion/data/rejected/g01-clean-conc01.jsonl"
+  },
+  "concurrence_max_observee": 3,
+  "controle_completude": true
+}

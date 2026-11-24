@@ -1,0 +1,26 @@
+{
+  "run": "mes-m1-c3-1",
+  "scenario": "clean",
+  "mode": "concurrent",
+  "concurrence": 3,
+  "statut": "succes",
+  "pages_attendues": 6,
+  "pages_recues": 6,
+  "pages_en_echec": [],
+  "requetes_http": 6,
+  "reprises": 0,
+  "incidents": {},
+  "lignes_vues": 24,
+  "acceptees": 24,
+  "rejetees": 0,
+  "motifs_rejet": {},
+  "duree_s": 0.369,
+  "publie": false,
+  "fichiers": {
+    "raw": "ingestion/data/raw/mes-m1-c3-1.jsonl",
+    "valid": "ingestion/data/valid/mes-m1-c3-1.jsonl",
+    "rejected": "ingestion/data/rejected/mes-m1-c3-1.jsonl"
+  },
+  "concurrence_max_observee": 3,
+  "controle_completude": true
+}

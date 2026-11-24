@@ -1,0 +1,9 @@
+2026-11-24 11:54:38,751 INFO début : scenario=clean run=g01-clean-seq01 mode=sequentiel concurrence=1 tentatives=4 timeout=1.0s
+2026-11-24 11:54:38,875 INFO page 1 reçue (tentative 1, 4 offres, 124 ms)
+2026-11-24 11:54:38,998 INFO page 2 reçue (tentative 1, 4 offres, 122 ms)
+2026-11-24 11:54:39,120 INFO page 3 reçue (tentative 1, 4 offres, 122 ms)
+2026-11-24 11:54:39,243 INFO page 4 reçue (tentative 1, 4 offres, 122 ms)
+2026-11-24 11:54:39,365 INFO page 5 reçue (tentative 1, 4 offres, 122 ms)
+2026-11-24 11:54:39,487 INFO page 6 reçue (tentative 1, 4 offres, 122 ms)
+2026-11-24 11:54:39,488 INFO concurrence maximale observée : 1 requête(s) simultanée(s)
+2026-11-24 11:54:39,489 INFO bilan : pages 6/6, requêtes 6, reprises 0, lignes 24 = 24 acceptées + 0 rejetées, 0.736 s
