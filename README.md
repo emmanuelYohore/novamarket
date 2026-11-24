@@ -116,7 +116,7 @@ Depuis `novamarket/`, exécutez la démonstration sur des grandeurs d'atelier, s
 docker compose exec -T postgres psql -X -v ON_ERROR_STOP=1 -U atelier -d novamarket < s2/exemple.sql
 ```
 
-Sous Windows, exécutez ces commandes dans le terminal WSL2. Si un fichier manque dans le conteneur après sa recréation, refaites la copie. Si le service est indisponible, consultez `docker compose logs --tail=50 postgres`. Si un import échoue, vérifiez les noms et types avec `\d`, confirmez le chemin et l'en-tête, puis annulez la transaction en échec avec `ROLLBACK;`. En cas d'erreur de clé, inspectez la réception avant de relancer. [Guide S1](../s1/DEMARRAGE.md) · [Référence SQL](../REFERENCE_SQL.md)
+Sous Windows, exécutez ces commandes dans le terminal WSL2. Si un fichier manque dans le conteneur après sa recréation, refaites la copie.  Si le service est indisponible, consultez `docker compose logs --tail=50 postgres`. Si un import échoue, vérifiez les noms et types avec `\d`, confirmez le chemin et l'en-tête, puis annulez la transaction en échec avec `ROLLBACK;`. En cas d'erreur de clé, inspectez la réception avant de relancer. [Guide S1](../s1/DEMARRAGE.md) · [Référence SQL](../REFERENCE_SQL.md)
 
 # NovaMarket S3 · Ingestion asynchrone
 
