@@ -1,0 +1,24 @@
+                                                                      QUERY PLAN                                                                       
+-------------------------------------------------------------------------------------------------------------------------------------------------------
+ Finalize Aggregate  (cost=136663.95..136663.96 rows=1 width=16) (actual time=772.975..773.792 rows=1 loops=1)
+   Buffers: shared hit=388 read=63356
+   ->  Gather  (cost=136663.73..136663.94 rows=2 width=16) (actual time=768.544..773.747 rows=3 loops=1)
+         Workers Planned: 2
+         Workers Launched: 2
+         Buffers: shared hit=388 read=63356
+         ->  Partial Aggregate  (cost=135663.73..135663.74 rows=1 width=16) (actual time=748.379..748.380 rows=1 loops=3)
+               Buffers: shared hit=388 read=63356
+               ->  Parallel Seq Scan on benchmark_sales  (cost=0.00..115825.03 rows=3967741 width=4) (actual time=8.983..430.163 rows=3166667 loops=3)
+                     Filter: (store_id = 1)
+                     Rows Removed by Filter: 166667
+                     Buffers: shared hit=388 read=63356
+ Planning:
+   Buffers: shared hit=73
+ Planning Time: 0.425 ms
+ JIT:
+   Functions: 17
+   Options: Inlining false, Optimization false, Expressions true, Deforming true
+   Timing: Generation 1.096 ms, Inlining 0.000 ms, Optimization 0.860 ms, Emission 26.120 ms, Total 28.076 ms
+ Execution Time: 789.396 ms
+(20 rows)
+

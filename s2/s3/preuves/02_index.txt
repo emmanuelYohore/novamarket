@@ -1,0 +1,12 @@
+Timing is on.
+DROP INDEX
+Time: 0.464 ms
+CREATE INDEX
+Time: 3043.336 ms (00:03.043)
+Timing is off.
+ANALYZE
+ taille_table | taille_index | taille_index_octets 
+--------------+--------------+---------------------
+ 498 MB       | 66 MB        |            69279744
+(1 row)
+

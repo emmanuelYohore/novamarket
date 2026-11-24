@@ -1,0 +1,13 @@
+requete;passage;execution_ms;planning_ms
+QA_store42;0;2.583;1.078
+QA_store42;1;0.192;0.295
+QA_store42;2;0.175;0.292
+QA_store42;3;0.274;0.423
+QA_store42;4;0.168;0.278
+QA_store42;5;0.176;0.328
+QB_store1;0;813.929;0.262
+QB_store1;1;770.195;0.465
+QB_store1;2;794.042;0.365
+QB_store1;3;789.396;0.425
+QB_store1;4;886.186;0.488
+QB_store1;5;1031.386;0.468

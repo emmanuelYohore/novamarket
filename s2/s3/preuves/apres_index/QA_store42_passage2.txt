@@ -1,0 +1,13 @@
+                                                                      QUERY PLAN                                                                       
+-------------------------------------------------------------------------------------------------------------------------------------------------------
+ Aggregate  (cost=278.15..278.16 rows=1 width=16) (actual time=0.115..0.115 rows=1 loops=1)
+   Buffers: shared hit=103
+   ->  Index Scan using benchmark_sales_store_idx on benchmark_sales  (cost=0.43..276.28 rows=373 width=4) (actual time=0.012..0.102 rows=100 loops=1)
+         Index Cond: (store_id = 42)
+         Buffers: shared hit=103
+ Planning:
+   Buffers: shared hit=73
+ Planning Time: 0.292 ms
+ Execution Time: 0.175 ms
+(9 rows)
+
