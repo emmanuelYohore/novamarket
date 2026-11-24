@@ -1,0 +1,84 @@
+CREATE SCHEMA
+psql:s2/sql/10_catalogue.sql:10: NOTICE:  table "categories_raw" does not exist, skipping
+psql:s2/sql/10_catalogue.sql:10: NOTICE:  table "products_raw" does not exist, skipping
+DROP TABLE
+CREATE TABLE
+CREATE TABLE
+COPY 10
+COPY 25
+== R1. Volumes reçus ==
+    fichier     | lignes 
+----------------+--------
+ categories.csv |     10
+ products.csv   |     25
+(2 rows)
+
+== R2. Champs vides (hors parent vide = racine) ==
+     t      | vides | racines 
+------------+-------+---------
+ categories |     0 |       2
+ products   |     0 |        
+(2 rows)
+
+== R3. Multiplicités à la réception (grain attendu : 1 ligne par code) ==
+    cle     | valeur | n 
+------------+--------+---
+ product_id | 3      | 2
+ sku        | NM-003 | 2
+(2 rows)
+
+== R4. Doublon exact ou contenu divergent ? ==
+ product_id | n | contenus_distincts 
+------------+---+--------------------
+ 3          | 2 |                  1
+(1 row)
+
+== R5. Références : catégorie inconnue, parent inconnu ==
+           controle            | n 
+-------------------------------+---
+ produit -> categorie inconnue | 0
+ categorie -> parent inconnu   | 0
+(2 rows)
+
+== R6. Couverture des codes produit des ventes S1 ==
+ produits_vendus | vendus_absents_catalogue | produits_catalogue | catalogue_sans_vente 
+-----------------+--------------------------+--------------------+----------------------
+              24 |                        0 |                 24 |                    0
+(1 row)
+
+== R6bis. Lignes rejetées en S1 : code produit présent au catalogue ? ==
+ ligne_no |       motif        | product_id | au_catalogue 
+----------+--------------------+------------+--------------
+      801 | doublon_exact      | 5          | t
+      802 | commande_orpheline | 1          | t
+(2 rows)
+
+== R7. Effet du doublon produit sur une jointure ventes x catalogue brut ==
+ lignes_ventes | lignes_apres_jointure_brute | lignes_en_trop 
+---------------+-----------------------------+----------------
+           800 |                         833 |             33
+(1 row)
+
+== R8. Écart entre le catalogue S2 dédoublonné et le catalogue déjà en base (S1) ==
+                     ecart                     | count 
+-----------------------------------------------+-------
+ categories S2 absentes ou différentes en base |     0
+ categories en base absentes de S2             |     0
+ produits S2 absents ou différents en base     |     0
+ produits en base absents de S2                |     0
+(4 rows)
+
+BEGIN
+INSERT 0 0
+INSERT 0 0
+INSERT 0 1
+psql:s2/sql/10_catalogue.sql:107: NOTICE:  constraint "categories_parent_diff_ck" of relation "categories" does not exist, skipping
+ALTER TABLE
+ALTER TABLE
+== R9. Comptages avant validation (attendu : 10 catégories, 24 produits) ==
+ categories | produits | lignes_ventes_inchangees 
+------------+----------+--------------------------
+         10 |       24 |                      800
+(1 row)
+
+COMMIT
