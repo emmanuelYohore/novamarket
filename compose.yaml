@@ -11,6 +11,7 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./s1:/s1:ro
+      - ./s2:/s2:ro
     mem_limit: 2g
     cpus: 2
     healthcheck:
@@ -28,6 +29,7 @@ services:
     volumes:
       - ./s4/travail:/work
       - ./s4/exemple:/exemple:ro
+      - ./transformation/dbt:/projet
     mem_limit: 1g
     cpus: 2
   metabase:

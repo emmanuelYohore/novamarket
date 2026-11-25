@@ -19,7 +19,8 @@ HAVING COUNT(*) > 1 AND COUNT(DISTINCT (order_id, product_id, quantity, unit_pri
 SELECT product_id, COUNT(*) AS n FROM reception.products_raw GROUP BY product_id HAVING COUNT(*) > 1;  -- attendu : 3
 
 \echo '== A3. Lignes d''articles dont la commande n''existe pas =='
-SELECT i.order_item_id, i.order_id, i.quantity * i.unit_price_cents AS montant_cents
+SELECT i.order_item_id, i.order_id,
+       i.quantity::integer * i.unit_price_cents::integer AS montant_cents
 FROM reception.order_items_raw i
 WHERE NOT EXISTS (SELECT 1 FROM reception.orders_raw o WHERE o.order_id = i.order_id);  -- attendu : 801 -> 9999
 

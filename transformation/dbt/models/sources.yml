@@ -1,0 +1,15 @@
+version: 2
+
+sources:
+  - name: fournisseur
+    schema: fournisseur
+    tables:
+      - name: offres
+        description: "Observations validées chargées depuis le collecteur S3."
+        columns:
+          - name: offer_id
+            tests:
+              - not_null
+          - name: observed_on
+            tests:
+              - not_null

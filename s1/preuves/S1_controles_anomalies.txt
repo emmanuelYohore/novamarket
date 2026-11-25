@@ -1,0 +1,14 @@
+NovaMarket S1 - verification des anomalies
+==========================================
+
+Script valide: s1/scripts/06_anomalies.sql
+
+- A1: doublon order_item_id=7, n=2
+- A1bis: aucun faux doublon
+- A2: doublon produit_id=3, n=2
+- A3: ligne orpheline order_item_id=801, order_id=9999, montant_cents=625
+- A3bis: aucun paiement sans commande
+- B1: jointure directe = 960 lignes, paiement naive=6543500 cents
+- B2: 400 commandes, lignes=3271750 cents, paiements=3271750 cents, ecarts=0
+- C completed: 320 commandes, CA=2621000 cents
+- D: 40 commandes annulees encaissees, montant=328375 cents

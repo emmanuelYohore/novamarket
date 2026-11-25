@@ -1,73 +1,24 @@
-# NovaMarket – S1 : SQL relationnel et premiers indicateurs
+# NovaMarket
 
-Base PostgreSQL 17 (Docker) construite à partir de `customers.csv`, `orders.csv`, `order_items.csv`, `payments.ndjson` (+ `categories`/`products`). Montants en **centimes d'euro**. Données fictives.
+Projet pédagogique cumulatif PostgreSQL, ingestion HTTP, dbt et volumétrie.
+La base utilise PostgreSQL 17 dans Docker. Tous les montants sont exprimés en centimes
+d’euro sauf indication contraire.
 
-## Exécuter
+## Organisation
 
-Depuis `novamarket/` :
-
-```bash
-docker compose up -d --wait postgres
-bash s1/scripts/run_s1.sh          # rejoue 01 -> 07 dans l'ordre
-```
-
-Connexion manuelle : `docker compose exec postgres psql -X -U atelier -d novamarket` (hôte : `127.0.0.1:15432`).
-
-| Script (`s1/scripts/`) | Rôle |
-| --- | --- |
-| `01_ddl.sql` | Schémas `reception`, `rejets`, `metier` ; tables, clés, contraintes, index |
-| `02_import_reception.sql` | `\copy` des CSV et du NDJSON, sans nettoyage |
-| `03_integration.sql` | Validation, journal des rejets, insertion dans `metier` |
-| `04_controles_volumes.sql` | Bilan reçues / intégrées / rejetées |
-| `05_indicateurs.sql` | Indicateurs M3 et cohérences |
-| `06_anomalies.sql` | M4 : doublons, orphelins, multiplication de jointure, périmètre du CA |
-| `07_controles_essentiels.sql` | M5 : contrôles OK/KO sur les valeurs attendues |
-| `run_s1.sh` | Enchaîne les scripts via Docker |
-
-Les fichiers bruts (`s1/donnees/`) ne sont jamais modifiés. Pour rejouer à neuf : `docker compose down -v` puis relancer.
-
-## Organisation du dépôt
-
-```
+```text
 novamarket/
-├── README.md
 ├── compose.yaml
-├── s1/
-│   ├── donnees/      # sources brutes, lecture seule
-│   ├── scripts/      # 01 à 07 + run_s1.sh
-│   └── preuves/      # livrable-pipeline.docx, sorties des scripts
+├── requirements-v3.txt
+├── s1/               # SQL relationnel
+├── s2/               # catalogue et fonctions SQL
+├── ingestion/        # collecteur S3
+├── s4/               # image dbt et profil local
+├── transformation/   # chargeur PostgreSQL et projet dbt
+└── README.md
 ```
 
-## État du projet
-
-| Mission | État |
-| --- | --- |
-| M1 Modélisation | Fait : schéma, 3 couches reception / rejets / metier |
-| M2 Création et import | Fait : 1 897 lignes reçues, 1 894 intégrées, 3 rejetées (journal conservé) |
-| M3 Indicateurs | Fait : 320/40/40 commandes, 30 clients sans commande, CA completed 2 621 000 cts, panier 81,91 € |
-| M4 Anomalies | Fait : tableau anomalie / détection / effet / décision dans le livrable |
-| M5 Cumulatif | Fait : `07_controles_essentiels.sql` et ce README. **À rejouer avant le commit** : coller la sortie dans `s1/preuves/` |
-| A1 Approfondissement | Non traité |
-
-## Décisions métier retenues
-
-- **CA = lignes des commandes `completed`** ; `pending` et `cancelled` sont rapportées à part.
-- **Panier moyen = CA ÷ commandes terminées** (320).
-- **Jamais de jointure directe `order_items` × `payments`** : chaque table est agrégée au grain commande avant la jointure.
-- Les doublons exacts et les références orphelines sont **rejetés et journalisés**, pas supprimés des sources.
-
-## Limites connues
-
-- Aucun contrôle de cohérence temporelle (`paid_on` vs `ordered_on`).
-- Des paiements `captured` existent sur des commandes `cancelled` (328 375 cts) : cause non établie (remboursement manquant ou erreur de statut ?). À confirmer avec le métier.
-- Le prix de ligne est celui de la transaction ; il n'est pas comparé au catalogue.
-
-# NovaMarket S2
-
-
-## Démarrer et vérifier
-
-Depuis `novamarket/` :
+## PostgreSQL
 
 ```bash
 docker compose up -d --wait postgres
@@ -75,54 +26,66 @@ docker compose ps
 docker compose exec postgres psql -X -U atelier -d novamarket
 ```
 
-Dans `psql`, utilisez `SELECT current_database();`, `\dt` et `\d nom_table` pour retrouver la base.
+Connexion hôte : `127.0.0.1:15432`. Le mot de passe local est configuré dans
+`compose.yaml` pour l’environnement de démonstration.
 
-## Sources à importer
+# NovaMarket S1 — SQL relationnel
 
-CSV UTF-8 séparés par des virgules, avec en-têtes. Les dates sont au format `AAAA-MM-JJ`.
-
-| Fichier | Colonnes et sens | Grain |
-| --- | --- | --- |
-| `donnees/categories.csv` | `category_id` code, `category_name` libellé, `parent_category_id` code du parent ou champ vide pour une racine. | Une catégorie du catalogue. |
-| `donnees/products.csv` | `product_id` code partagé avec les lignes S1, `sku` référence commerciale, `product_name` libellé, `category_id` code de classement, `first_listed_on` date déclarée de première mise en vente. | Une fiche produit à la source, dont l'unicité reste à contrôler. |
-
-Pour transférer les fichiers vers le client `psql` conteneurisé, quitter `psql` avec `\q` puis lancer ces commandes depuis `novamarket/` :
+Rejouer les scripts S1 :
 
 ```bash
-docker compose exec -T postgres mkdir -p /tmp/novamarket-s2
-docker compose cp s2/donnees/. postgres:/tmp/novamarket-s2/
-docker compose exec -T postgres ls -l /tmp/novamarket-s2
+docker compose up -d --wait postgres
+bash s1/scripts/run_s1.sh
 ```
 
-Créez vos tables de réception et utilisez `\copy` depuis `psql`. Gardez le brut disponible pour vos contrôles. Inspectez les champs vides, les identifiants et la couverture des codes produit de S1 avant d'intégrer le catalogue. Importez les catégories avant les produits. Décidez comment garantir l'intégrité des liens, en tenant compte de votre schéma S1 et des lignes qu'il contient déjà. Travaillez par transaction et vérifiez vos comptages avant de valider. Si vous utilisez des tables temporaires, gardez ouverte la session qui les a créées.
-
-## Missions S2
-
-| Mission | Travail du groupe |
+| Script | Rôle |
 | --- | --- |
-| **M1 — Enrichissement** | Intégrer le catalogue dans la base S1 et vérifier la couverture des codes produit. Examiner les multiplicités à la réception avant d'ajouter des contraintes ou de joindre les ventes. |
-| **M2 — Classements** | Classer les produits et les clients selon leurs performances commerciales. Justifier les groupes de comparaison et le traitement des ex æquo. Mesurer l'effet de duplications sur au moins un classement. |
-| **M3 — Évolution** | Comparer les ventes entre périodes avec `LAG()` et `LEAD()`. Contrôler la couverture des périodes et la cohérence des dates entre ventes et catalogue. Distinguer une évolution inhabituelle d'une incohérence démontrée. |
-| **M4 — Segmentation** | Segmenter les clients selon leurs performances avec `NTILE()`. Expliciter la population, la mesure, l'ordre et le traitement des égalités. |
+| `01_ddl.sql` | Schémas, tables, clés, contraintes et index |
+| `02_import_reception.sql` | Import brut sans nettoyage |
+| `03_integration.sql` | Validation, rejets et insertion métier |
+| `04_controles_volumes.sql` | Bilan des lignes reçues, intégrées et rejetées |
+| `05_indicateurs.sql` | Indicateurs commerciaux |
+| `06_anomalies.sql` | Doublons, orphelins, jointures et périmètre du CA |
+| `07_controles_essentiels.sql` | Contrôles attendus |
 
+État validé :
 
-Consignez le grain, le périmètre de vente et les limites d'interprétation avec chaque résultat. Les décisions d'analyse et les requêtes sont à construire en groupe.
+- 1 897 lignes reçues, 1 894 intégrées et 3 rejetées.
+- 320 commandes `completed`, 40 `pending`, 40 `cancelled`.
+- 30 clients sans commande.
+- CA `completed` : 2 621 000 centimes.
+- Panier moyen : 81,91 €.
 
-## Exemple indépendant et dépannage
+Décisions métier :
 
-Depuis `novamarket/`, exécutez la démonstration sur des grandeurs d'atelier, sans tables permanentes :
+- Le CA retenu correspond aux lignes des commandes `completed`.
+- Les doublons exacts et références orphelines sont rejetés et journalisés.
+- Les tables agrégées au grain commande évitent la multiplication des paiements.
+
+# NovaMarket S2 — Catalogue et analyses SQL
+
+Créer les données du catalogue :
 
 ```bash
-docker compose exec -T postgres psql -X -v ON_ERROR_STOP=1 -U atelier -d novamarket < s2/exemple.sql
+docker compose exec -T postgres psql -X -v ON_ERROR_STOP=1 \
+  -U atelier -d novamarket -f /s2/sql/10_catalogue.sql
 ```
 
-Sous Windows, exécutez ces commandes dans le terminal WSL2. Si un fichier manque dans le conteneur après sa recréation, refaites la copie.  Si le service est indisponible, consultez `docker compose logs --tail=50 postgres`. Si un import échoue, vérifiez les noms et types avec `\d`, confirmez le chemin et l'en-tête, puis annulez la transaction en échec avec `ROLLBACK;`. En cas d'erreur de clé, inspectez la réception avant de relancer. [Guide S1](../s1/DEMARRAGE.md) · [Référence SQL](../REFERENCE_SQL.md)
+Utiliser les scripts suivants :
 
-# NovaMarket S3 · Ingestion asynchrone
+```text
+s2/sql/10_catalogue.sql
+s2/sql/11_analyses.sql
+s2/s3/sql/20_requetes.sql
+s2/s3/sql/21_index.sql
+s2/s3/sql/22_analyse_critique.sql
+```
 
-## Préparer
+Les preuves sont conservées dans `s2/preuves/` et `s2/s3/preuves/`.
 
-Depuis `novamarket/`, avec Python **3.12** disponible :
+# NovaMarket S3 — Ingestion asynchrone
+
+Préparer l’environnement Python :
 
 ```bash
 python3.12 -m venv .venv
@@ -133,26 +96,154 @@ python ingestion/tests/disponibilite.py
 python ingestion/exemple.py
 ```
 
-## Contrat HTTP
+Contrat HTTP :
 
-`GET /health` retourne `{"status":"ok"}`. `GET /offers?page=1&scenario=atelier&run=groupe01-essai01` retourne `page`, `total_pages`, `next_page` (nul à la fin) et une liste `items`. Exemple de sondage indépendant du collecteur :
-
-```bash
-curl -fsS 'http://127.0.0.1:18080/offers?page=1&scenario=clean&run=sonde'
+```text
+GET /health
+GET /offers?page=1&scenario=atelier&run=groupe01-essai01
 ```
 
-| Champ | Contrat |
+L’API expose les fournisseurs F01, F02 et F03. Les sorties sont conservées dans
+`ingestion/data/raw/`, `ingestion/data/valid/`, `ingestion/data/rejected/` et
+`ingestion/data/bilans/`. Ne publiez pas un lot incomplet comme valide.
+
+Fichier de secours pour S4 :
+
+```text
+transformation/secours/offres.jsonl
+```
+
+# NovaMarket S4 — Chargement PostgreSQL et dbt
+
+## État
+
+| Mission | État |
 | --- | --- |
-| `offer_id`, `supplier_id` | Identifiants texte stables. Les fournisseurs de simulation sont F01, F02 et F03. |
-| `product_id` | Entier parmi les produits du catalogue S2. |
-| `price_cents`, `available_units` | Entiers non négatifs, centimes et unités; `currency` vaut EUR. |
-| `observed_on` | Jour ISO AAAA-MM-JJ. |
+| M1 — Chargeur Python | Fait : transaction, validation, rejets et rejeu idempotent |
+| M2 — Sources dbt | Fait : source `fournisseur.offres` déclarée |
+| M3 — Staging | Fait : modèle de vue `stg_offres` |
+| M4 — Intermediate et mart | Fait : modèle éphémère et table par produit/jour |
+| M5 — Vérification | Fait : `debug`, `compile`, `run` et `build` validés |
 
-Six pages de quatre enregistrements. Choisir un `run` neuf pour rejouer les premières tentatives. `clean` fournit le contrôle sans fautes. `atelier` injecte réponses transitoires (429 avec `Retry-After`, JSON invalide, délai) et anomalies métier. `panne` produit une erreur permanente. La latence de base se règle par `NOVAMARKET_API_LATENCY`. Comparer les collectes avec le même scénario et la même latence. Borner le nombre d'essais et la concurrence. Compter les essais HTTP et les lignes séparément.
+## Arborescence
 
-## Sorties et reprise
+```text
+s4/
+├── Dockerfile
+├── dbt-dependances.txt
+├── exemple/
+└── travail/profil/profiles.yml
 
-Une exécution complète produit des fichiers UTF-8 JSONL à raison d'un objet par ligne. `data/raw/` garde les pages reçues; `data/valid/offres.jsonl` conserve les champs du contrat; `data/rejected/` conserve page, position, motif et objet brut. Le bilan distingue pages reçues, lignes examinées, valides et rejetées, reprises et durée. Prévoir un nouveau répertoire par essai ou un archivage explicite. Un lot incomplet ne doit pas être publié comme valide. Utiliser l'[entrée validée S4](../transformation/secours/offres.jsonl) si le collecteur doit être repris.
+transformation/
+├── chargement_postgres.py
+├── exemple.py
+├── secours/offres.jsonl
+├── preuves/S4_verifications.txt
+└── dbt/
+    ├── dbt_project.yml
+    ├── profiles.exemple.yml
+    └── models/
+        ├── sources.yml
+        ├── staging/stg_offres.sql
+        ├── intermediate/int_offres_par_observation.sql
+        └── marts/mart_offres_par_produit.sql
+```
 
-Si le port est pris, ajuster `NOVAMARKET_API_PORT` à la fois pour Compose et le shell. Examiner `docker compose logs fournisseur`. L'API fonctionne seule si les travaux SQL S2 sont incomplets. Le formateur peut préparer le catalogue canonique pour la validation et le chargement suivants.
+Le projet dbt unique est `transformation/dbt/`, monté dans le conteneur sur `/projet`.
+Le profil privé est `s4/travail/profil/profiles.yml`, ignoré par Git.
 
+## Initialiser les données
+
+Depuis la racine du dépôt :
+
+```bash
+docker compose up -d --wait postgres
+bash s1/scripts/run_s1.sh
+docker compose exec -T postgres psql -X -v ON_ERROR_STOP=1 \
+  -U atelier -d novamarket -f /s2/sql/10_catalogue.sql
+```
+
+## Charger les offres
+
+Configurer la DSN locale sans écrire le mot de passe dans le dépôt :
+
+```bash
+export NOVAMARKET_DSN='host=127.0.0.1 port=15432 dbname=novamarket user=atelier'
+```
+
+Fournir le mot de passe avec `PGPASSFILE` ou la configuration PostgreSQL locale.
+
+```bash
+python transformation/exemple.py
+python transformation/chargement_postgres.py
+python transformation/chargement_postgres.py
+```
+
+Le chargeur lit `ingestion/data/valid/offres.jsonl`, puis le fichier de secours
+`transformation/secours/offres.jsonl` si le lot validé n’existe pas.
+
+### Grain et contrôles
+
+- Une observation représente une offre fournisseur pour un produit à une date.
+- La clé métier est `(offer_id, observed_on)`.
+- Les identifiants sont non vides.
+- Les fournisseurs doivent être F01, F02 ou F03.
+- La devise est EUR.
+- Le prix et les unités disponibles sont des entiers non négatifs.
+- La date suit le format ISO `AAAA-MM-JJ`.
+- Le produit doit exister dans `metier.products`.
+- Les rejets sont conservés dans `fournisseur.rejets`.
+- Le second chargement du même lot ne crée aucune duplication.
+
+## Construire dbt
+
+```bash
+docker compose config -q
+docker compose --profile transfo build dbt
+mkdir -p s4/travail/profil
+
+read -rs DBT_ENV_SECRET_PASSWORD
+export DBT_ENV_SECRET_PASSWORD
+export DBT_DATABASE=novamarket
+
+docker compose --profile transfo run --rm --no-deps --user "0:0" \
+  -w /projet -e DBT_ENV_SECRET_PASSWORD -e DBT_DATABASE dbt \
+  dbt debug --profiles-dir /work/profil
+
+docker compose --profile transfo run --rm --no-deps --user "0:0" \
+  -w /projet -e DBT_ENV_SECRET_PASSWORD -e DBT_DATABASE dbt \
+  dbt compile --profiles-dir /work/profil
+
+docker compose --profile transfo run --rm --no-deps --user "0:0" \
+  -w /projet -e DBT_ENV_SECRET_PASSWORD -e DBT_DATABASE dbt \
+  dbt run --profiles-dir /work/profil
+
+docker compose --profile transfo run --rm --no-deps --user "0:0" \
+  -w /projet -e DBT_ENV_SECRET_PASSWORD -e DBT_DATABASE dbt \
+  dbt build --profiles-dir /work/profil
+```
+
+Le profil `novamarket_dbt` correspond à `profile: novamarket_dbt` dans
+`transformation/dbt/dbt_project.yml`. Le mot de passe n’est fourni que par
+`DBT_ENV_SECRET_PASSWORD`.
+
+## Résultats vérifiés
+
+- Premier passage : 20 lignes examinées, 20 chargées, aucun rejet.
+- Second passage : 20 lignes inchangées, aucune nouvelle ligne.
+- Source `fournisseur.offres` : 20 lignes.
+- Vue `dbt_dev.stg_offres` : 20 lignes.
+- Table `dbt_dev.mart_offres_par_produit` : 20 lignes.
+- Mart : 488 unités disponibles.
+- `dbt debug` : toutes les vérifications réussies.
+- `dbt build` : 8 contrôles/modèles réussis, aucune erreur ni alerte.
+
+La preuve consolidée est disponible dans
+`transformation/preuves/S4_verifications.txt`.
+
+## Limites
+
+- Le chargeur vérifie les références produit uniquement si `metier.products` existe.
+- Le mart agrège au grain produit/jour ; il ne compare pas plusieurs jours.
+- Les données brutes S3 ne sont pas modifiées.
+- Ne committez ni `.env`, ni mot de passe, ni volume Docker, ni dossiers `target/` ou `logs/`.

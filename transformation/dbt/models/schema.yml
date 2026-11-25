@@ -1,0 +1,22 @@
+version: 2
+
+models:
+  - name: stg_offres
+    description: "Staging des offres, harmonisé sans changement de grain."
+    columns:
+      - name: offer_id
+        tests:
+          - not_null
+      - name: observed_on
+        tests:
+          - not_null
+
+  - name: mart_offres_par_produit
+    description: "Mart au grain produit/jour."
+    columns:
+      - name: product_id
+        tests:
+          - not_null
+      - name: observed_on
+        tests:
+          - not_null
