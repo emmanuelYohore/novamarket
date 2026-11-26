@@ -1,0 +1,252 @@
+## M4 — pipeline PySpark
+== Schéma inféré des trajets ==
+root
+ |-- Start_Zone: long (nullable = true)
+ |-- Trip_Distance: double (nullable = true)
+ |-- Trip_Duration: long (nullable = true)
+ |-- extraction: string (nullable = true)
+ |-- rang: long (nullable = true)
+ |-- source_partition: string (nullable = true)
+ |-- source_repo: string (nullable = true)
+ |-- source_revision: string (nullable = true)
+== Schéma inféré des zones (tout en texte) ==
+root
+ |-- LocationID: string (nullable = true)
+ |-- Borough: string (nullable = true)
+ |-- Zone: string (nullable = true)
+ |-- service_zone: string (nullable = true)
+== Schéma typé des trajets ==
+root
+ |-- rang: long (nullable = true)
+ |-- zone_id: integer (nullable = true)
+ |-- distance_miles: double (nullable = true)
+ |-- duree_s: double (nullable = true)
+ |-- source_revision: string (nullable = true)
+== Clé zones ==
+{'lignes': 265, 'cles_distinctes': 265, 'cles_nulles': 0}
+== Trajets non appariés ==
++-------+----+--------------+-------+----------------------------+---------+-----------+
+|zone_id|rang|distance_miles|duree_s|source_revision             |duree_min|vitesse_mph|
++-------+----+--------------+-------+----------------------------+---------+-----------+
+|999    |6   |1.0           |300.0  |aucune (fichier synthétique)|5.0      |12.0       |
++-------+----+--------------+-------+----------------------------+---------+-----------+
+== Partitions ==
+{'trajets_lus': 1, 'resultat': 1}
+== Plan d'exécution (explain formatted) ==
+== Physical Plan ==
+AdaptiveSparkPlan (35)
++- == Final Plan ==
+   ResultQueryStage (21)
+   +- * Sort (20)
+      +- AQEShuffleRead (19)
+         +- ShuffleQueryStage (18), Statistics(sizeInBytes=352.0 B, rowCount=3)
+            +- Exchange (17)
+               +- * HashAggregate (16)
+                  +- AQEShuffleRead (15)
+                     +- ShuffleQueryStage (14), Statistics(sizeInBytes=424.0 B, rowCount=3)
+                        +- Exchange (13)
+                           +- * HashAggregate (12)
+                              +- * Project (11)
+                                 +- * BroadcastHashJoin Inner BuildLeft (10)
+                                    :- BroadcastQueryStage (6), Statistics(sizeInBytes=1031.8 KiB, rowCount=5)
+                                    :  +- BroadcastExchange (5)
+                                    :     +- * Project (4)
+                                    :        +- * Project (3)
+                                    :           +- * Filter (2)
+                                    :              +- Scan json  (1)
+                                    +- * Project (9)
+                                       +- * Filter (8)
+                                          +- Scan csv  (7)
++- == Initial Plan ==
+   Sort (34)
+   +- Exchange (33)
+      +- HashAggregate (32)
+         +- Exchange (31)
+            +- HashAggregate (30)
+               +- Project (29)
+                  +- BroadcastHashJoin Inner BuildLeft (28)
+                     :- BroadcastExchange (25)
+                     :  +- Project (24)
+                     :     +- Project (23)
+                     :        +- Filter (22)
+                     :           +- Scan json  (1)
+                     +- Project (27)
+                        +- Filter (26)
+                           +- Scan csv  (7)
+(1) Scan json 
+Output [3]: [Start_Zone#6L, Trip_Distance#7, Trip_Duration#8L]
+Batched: false
+Location: InMemoryFileIndex [file:/home/claude/fix/novamarket-main/volumetrie/data/entree_spark_g01-secours01.jsonl]
+PushedFilters: [IsNotNull(Start_Zone), IsNotNull(Trip_Distance), IsNotNull(Trip_Duration), GreaterThan(Trip_Distance,0.0)]
+ReadSchema: struct<Start_Zone:bigint,Trip_Distance:double,Trip_Duration:bigint>
+(2) Filter [codegen id : 1]
+Input [3]: [Start_Zone#6L, Trip_Distance#7, Trip_Duration#8L]
+Condition : (((((isnotnull(Start_Zone#6L) AND isnotnull(Trip_Distance#7)) AND isnotnull(Trip_Duration#8L)) AND isnotnull(cast(Start_Zone#6L as int))) AND (Trip_Distance#7 > 0.0)) AND (cast(Trip_Duration#8L as double) > 0.0))
+(3) Project [codegen id : 1]
+Output [3]: [cast(Start_Zone#6L as int) AS zone_id#36, Trip_Distance#7 AS distance_miles#37, cast(Trip_Duration#8L as double) AS duree_s#38]
+Input [3]: [Start_Zone#6L, Trip_Distance#7, Trip_Duration#8L]
+(4) Project [codegen id : 1]
+Output [4]: [zone_id#36, distance_miles#37, (duree_s#38 / 60.0) AS duree_min#66, (distance_miles#37 / (duree_s#38 / 3600.0)) AS vitesse_mph#67]
+Input [3]: [zone_id#36, distance_miles#37, duree_s#38]
+(5) BroadcastExchange
+Input [4]: [zone_id#36, distance_miles#37, duree_min#66, vitesse_mph#67]
+Arguments: HashedRelationBroadcastMode(List(cast(input[0, int, true] as bigint)),false), [plan_id=722]
+(6) BroadcastQueryStage
+Output [4]: [zone_id#36, distance_miles#37, duree_min#66, vitesse_mph#67]
+Arguments: 0
+(7) Scan csv 
+Output [4]: [LocationID#31, Borough#32, Zone#33, service_zone#34]
+Batched: false
+Location: InMemoryFileIndex [file:/home/claude/fix/novamarket-main/volumetrie/secours/zones.csv]
+ReadSchema: struct<LocationID:string,Borough:string,Zone:string,service_zone:string>
+(8) Filter
+Input [4]: [LocationID#31, Borough#32, Zone#33, service_zone#34]
+Condition : isnotnull(cast(LocationID#31 as int))
+(9) Project
+Output [4]: [cast(LocationID#31 as int) AS zone_id#40, Borough#32 AS arrondissement#41, Zone#33 AS zone#42, service_zone#34 AS zone_service#43]
+Input [4]: [LocationID#31, Borough#32, Zone#33, service_zone#34]
+(10) BroadcastHashJoin [codegen id : 2]
+Left keys [1]: [zone_id#36]
+Right keys [1]: [zone_id#40]
+Join type: Inner
+Join condition: None
+(11) Project [codegen id : 2]
+Output [7]: [zone_id#36, distance_miles#37, duree_min#66, vitesse_mph#67, arrondissement#41, zone#42, zone_service#43]
+Input [8]: [zone_id#36, distance_miles#37, duree_min#66, vitesse_mph#67, zone_id#40, arrondissement#41, zone#42, zone_service#43]
+(12) HashAggregate [codegen id : 2]
+Input [7]: [zone_id#36, distance_miles#37, duree_min#66, vitesse_mph#67, arrondissement#41, zone#42, zone_service#43]
+Keys [4]: [zone_id#36, arrondissement#41, zone#42, zone_service#43]
+Functions [5]: [partial_count(1), partial_sum(distance_miles#37), partial_avg(distance_miles#37), partial_avg(duree_min#66), partial_avg(vitesse_mph#67)]
+Aggregate Attributes [8]: [count#197L, sum#198, sum#199, count#200L, sum#201, count#202L, sum#203, count#204L]
+Results [12]: [zone_id#36, arrondissement#41, zone#42, zone_service#43, count#205L, sum#206, sum#207, count#208L, sum#209, count#210L, sum#211, count#212L]
+(13) Exchange
+Input [12]: [zone_id#36, arrondissement#41, zone#42, zone_service#43, count#205L, sum#206, sum#207, count#208L, sum#209, count#210L, sum#211, count#212L]
+Arguments: hashpartitioning(zone_id#36, arrondissement#41, zone#42, zone_service#43, 2), ENSURE_REQUIREMENTS, [plan_id=785]
+(14) ShuffleQueryStage
+Output [12]: [zone_id#36, arrondissement#41, zone#42, zone_service#43, count#205L, sum#206, sum#207, count#208L, sum#209, count#210L, sum#211, count#212L]
+Arguments: 1
+(15) AQEShuffleRead
+Input [12]: [zone_id#36, arrondissement#41, zone#42, zone_service#43, count#205L, sum#206, sum#207, count#208L, sum#209, count#210L, sum#211, count#212L]
+Arguments: coalesced
+(16) HashAggregate [codegen id : 3]
+Input [12]: [zone_id#36, arrondissement#41, zone#42, zone_service#43, count#205L, sum#206, sum#207, count#208L, sum#209, count#210L, sum#211, count#212L]
+Keys [4]: [zone_id#36, arrondissement#41, zone#42, zone_service#43]
+Functions [5]: [count(1), sum(distance_miles#37), avg(distance_miles#37), avg(duree_min#66), avg(vitesse_mph#67)]
+Aggregate Attributes [5]: [count(1)#184L, sum(distance_miles#37)#185, avg(distance_miles#37)#186, avg(duree_min#66)#187, avg(vitesse_mph#67)#188]
+Results [9]: [zone_id#36, arrondissement#41, zone#42, zone_service#43, count(1)#184L AS nb_trajets#169L, round(sum(distance_miles#37)#185, 2) AS distance_totale_miles#170, round(avg(distance_miles#37)#186, 3) AS distance_moy_miles#171, round(avg(duree_min#66)#187, 2) AS duree_moy_min#172, round(avg(vitesse_mph#67)#188, 2) AS vitesse_moy_mph#173]
+(17) Exchange
+Input [9]: [zone_id#36, arrondissement#41, zone#42, zone_service#43, nb_trajets#169L, distance_totale_miles#170, distance_moy_miles#171, duree_moy_min#172, vitesse_moy_mph#173]
+Arguments: rangepartitioning(zone_id#36 ASC NULLS FIRST, 2), ENSURE_REQUIREMENTS, [plan_id=821]
+(18) ShuffleQueryStage
+Output [9]: [zone_id#36, arrondissement#41, zone#42, zone_service#43, nb_trajets#169L, distance_totale_miles#170, distance_moy_miles#171, duree_moy_min#172, vitesse_moy_mph#173]
+Arguments: 2
+(19) AQEShuffleRead
+Input [9]: [zone_id#36, arrondissement#41, zone#42, zone_service#43, nb_trajets#169L, distance_totale_miles#170, distance_moy_miles#171, duree_moy_min#172, vitesse_moy_mph#173]
+Arguments: coalesced
+(20) Sort [codegen id : 4]
+Input [9]: [zone_id#36, arrondissement#41, zone#42, zone_service#43, nb_trajets#169L, distance_totale_miles#170, distance_moy_miles#171, duree_moy_min#172, vitesse_moy_mph#173]
+Arguments: [zone_id#36 ASC NULLS FIRST], true, 0
+(21) ResultQueryStage
+Output [9]: [zone_id#36, arrondissement#41, zone#42, zone_service#43, nb_trajets#169L, distance_totale_miles#170, distance_moy_miles#171, duree_moy_min#172, vitesse_moy_mph#173]
+Arguments: 3
+(22) Filter
+Input [3]: [Start_Zone#6L, Trip_Distance#7, Trip_Duration#8L]
+Condition : (((((isnotnull(Start_Zone#6L) AND isnotnull(Trip_Distance#7)) AND isnotnull(Trip_Duration#8L)) AND isnotnull(cast(Start_Zone#6L as int))) AND (Trip_Distance#7 > 0.0)) AND (cast(Trip_Duration#8L as double) > 0.0))
+(23) Project
+Output [3]: [cast(Start_Zone#6L as int) AS zone_id#36, Trip_Distance#7 AS distance_miles#37, cast(Trip_Duration#8L as double) AS duree_s#38]
+Input [3]: [Start_Zone#6L, Trip_Distance#7, Trip_Duration#8L]
+(24) Project
+Output [4]: [zone_id#36, distance_miles#37, (duree_s#38 / 60.0) AS duree_min#66, (distance_miles#37 / (duree_s#38 / 3600.0)) AS vitesse_mph#67]
+Input [3]: [zone_id#36, distance_miles#37, duree_s#38]
+(25) BroadcastExchange
+Input [4]: [zone_id#36, distance_miles#37, duree_min#66, vitesse_mph#67]
+Arguments: HashedRelationBroadcastMode(List(cast(input[0, int, true] as bigint)),false), [plan_id=682]
+(26) Filter
+Input [4]: [LocationID#31, Borough#32, Zone#33, service_zone#34]
+Condition : isnotnull(cast(LocationID#31 as int))
+(27) Project
+Output [4]: [cast(LocationID#31 as int) AS zone_id#40, Borough#32 AS arrondissement#41, Zone#33 AS zone#42, service_zone#34 AS zone_service#43]
+Input [4]: [LocationID#31, Borough#32, Zone#33, service_zone#34]
+(28) BroadcastHashJoin
+Left keys [1]: [zone_id#36]
+Right keys [1]: [zone_id#40]
+Join type: Inner
+Join condition: None
+(29) Project
+Output [7]: [zone_id#36, distance_miles#37, duree_min#66, vitesse_mph#67, arrondissement#41, zone#42, zone_service#43]
+Input [8]: [zone_id#36, distance_miles#37, duree_min#66, vitesse_mph#67, zone_id#40, arrondissement#41, zone#42, zone_service#43]
+(30) HashAggregate
+Input [7]: [zone_id#36, distance_miles#37, duree_min#66, vitesse_mph#67, arrondissement#41, zone#42, zone_service#43]
+Keys [4]: [zone_id#36, arrondissement#41, zone#42, zone_service#43]
+Functions [5]: [partial_count(1), partial_sum(distance_miles#37), partial_avg(distance_miles#37), partial_avg(duree_min#66), partial_avg(vitesse_mph#67)]
+Aggregate Attributes [8]: [count#197L, sum#198, sum#199, count#200L, sum#201, count#202L, sum#203, count#204L]
+Results [12]: [zone_id#36, arrondissement#41, zone#42, zone_service#43, count#205L, sum#206, sum#207, count#208L, sum#209, count#210L, sum#211, count#212L]
+(31) Exchange
+Input [12]: [zone_id#36, arrondissement#41, zone#42, zone_service#43, count#205L, sum#206, sum#207, count#208L, sum#209, count#210L, sum#211, count#212L]
+Arguments: hashpartitioning(zone_id#36, arrondissement#41, zone#42, zone_service#43, 2), ENSURE_REQUIREMENTS, [plan_id=687]
+(32) HashAggregate
+Input [12]: [zone_id#36, arrondissement#41, zone#42, zone_service#43, count#205L, sum#206, sum#207, count#208L, sum#209, count#210L, sum#211, count#212L]
+Keys [4]: [zone_id#36, arrondissement#41, zone#42, zone_service#43]
+Functions [5]: [count(1), sum(distance_miles#37), avg(distance_miles#37), avg(duree_min#66), avg(vitesse_mph#67)]
+Aggregate Attributes [5]: [count(1)#184L, sum(distance_miles#37)#185, avg(distance_miles#37)#186, avg(duree_min#66)#187, avg(vitesse_mph#67)#188]
+Results [9]: [zone_id#36, arrondissement#41, zone#42, zone_service#43, count(1)#184L AS nb_trajets#169L, round(sum(distance_miles#37)#185, 2) AS distance_totale_miles#170, round(avg(distance_miles#37)#186, 3) AS distance_moy_miles#171, round(avg(duree_min#66)#187, 2) AS duree_moy_min#172, round(avg(vitesse_mph#67)#188, 2) AS vitesse_moy_mph#173]
+(33) Exchange
+Input [9]: [zone_id#36, arrondissement#41, zone#42, zone_service#43, nb_trajets#169L, distance_totale_miles#170, distance_moy_miles#171, duree_moy_min#172, vitesse_moy_mph#173]
+Arguments: rangepartitioning(zone_id#36 ASC NULLS FIRST, 2), ENSURE_REQUIREMENTS, [plan_id=690]
+(34) Sort
+Input [9]: [zone_id#36, arrondissement#41, zone#42, zone_service#43, nb_trajets#169L, distance_totale_miles#170, distance_moy_miles#171, duree_moy_min#172, vitesse_moy_mph#173]
+Arguments: [zone_id#36 ASC NULLS FIRST], true, 0
+(35) AdaptiveSparkPlan
+Output [9]: [zone_id#36, arrondissement#41, zone#42, zone_service#43, nb_trajets#169L, distance_totale_miles#170, distance_moy_miles#171, duree_moy_min#172, vitesse_moy_mph#173]
+Arguments: isFinalPlan=true
+== Schéma du Parquet relu ==
+root
+ |-- zone_id: integer (nullable = true)
+ |-- arrondissement: string (nullable = true)
+ |-- zone: string (nullable = true)
+ |-- zone_service: string (nullable = true)
+ |-- nb_trajets: long (nullable = true)
+ |-- distance_totale_miles: double (nullable = true)
+ |-- distance_moy_miles: double (nullable = true)
+ |-- duree_moy_min: double (nullable = true)
+ |-- vitesse_moy_mph: double (nullable = true)
+== Parquet relu ==
++-------+--------------+--------------+------------+----------+---------------------+------------------+-------------+---------------+
+|zone_id|arrondissement|zone          |zone_service|nb_trajets|distance_totale_miles|distance_moy_miles|duree_moy_min|vitesse_moy_mph|
++-------+--------------+--------------+------------+----------+---------------------+------------------+-------------+---------------+
+|1      |EWR           |Newark Airport|EWR         |1         |2.5                  |2.5               |10.0         |15.0           |
+|4      |Manhattan     |Alphabet City |Yellow Zone |2         |4.5                  |2.25              |9.17         |14.46          |
+|7      |Queens        |Astoria       |Boro Zone   |1         |4.0                  |4.0               |15.0         |16.0           |
++-------+--------------+--------------+------------+----------+---------------------+------------------+-------------+---------------+
+== Bilan ==
+{
+  "run": "g01-secours01",
+  "entree": "volumetrie/data/entree_spark_g01-secours01.jsonl",
+  "sortie": "volumetrie/sorties/g01-secours01-essai1",
+  "lignes_lues": 5,
+  "apres_filtre": 5,
+  "zones": {
+    "lignes": 265,
+    "cles_distinctes": 265,
+    "cles_nulles": 0
+  },
+  "non_apparies": 1,
+  "zones_inconnues": [
+    999
+  ],
+  "avant_jointure": 5,
+  "apres_jointure": 4,
+  "partitions": {
+    "trajets_lus": 1,
+    "resultat": 1
+  },
+  "parquet": {
+    "lignes": 3,
+    "somme_nb_trajets": 4
+  },
+  "controle": "ok"
+}
+code retour : 0
+## Relance sur le même dossier (doit être refusée)
+volumetrie/sorties/g01-secours01-essai1 existe déjà : choisir un nouveau dossier de sortie.
+code retour : 1

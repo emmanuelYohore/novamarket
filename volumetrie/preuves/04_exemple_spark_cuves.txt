@@ -1,0 +1,39 @@
+## Exemple indépendant du formateur (cuves)
+root
+ |-- cuve: long (nullable = true)
+ |-- brut: string (nullable = true)
+Partitions avant traitement : 2
+== Physical Plan ==
+AdaptiveSparkPlan isFinalPlan=false
++- HashAggregate(keys=[atelier#3], functions=[sum(millilitres#5)])
+   +- Exchange hashpartitioning(atelier#3, 2), ENSURE_REQUIREMENTS, [plan_id=48]
+      +- HashAggregate(keys=[atelier#3], functions=[partial_sum(millilitres#5)])
+         +- Project [atelier#3, (litres#4 * 1000.0) AS millilitres#5]
+            +- SortMergeJoin [cuve#0L], [cuve#2L], Inner
+               :- Sort [cuve#0L ASC NULLS FIRST], false, 0
+               :  +- Exchange hashpartitioning(cuve#0L, 2), ENSURE_REQUIREMENTS, [plan_id=40]
+               :     +- Project [cuve#0L, cast(brut#1 as double) AS litres#4]
+               :        +- Filter ((isnotnull(brut#1) AND (cast(brut#1 as double) >= 0.0)) AND isnotnull(cuve#0L))
+               :           +- Scan ExistingRDD[cuve#0L,brut#1]
+               +- Sort [cuve#2L ASC NULLS FIRST], false, 0
+                  +- Exchange hashpartitioning(cuve#2L, 2), ENSURE_REQUIREMENTS, [plan_id=41]
++- Filter isnotnull(cuve#2L)
++- Scan ExistingRDD[cuve#2L,atelier#3]
+
+
+
+
+
+
+
+
+
+
+
+
++-------+----------------+
+|atelier|sum(millilitres)|
++-------+----------------+
+|      A|         32500.0|
+|      B|          3000.0|
++-------+----------------+

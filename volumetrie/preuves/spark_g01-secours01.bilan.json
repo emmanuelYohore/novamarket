@@ -1,0 +1,27 @@
+{
+  "run": "g01-secours01",
+  "entree": "volumetrie/data/entree_spark_g01-secours01.jsonl",
+  "sortie": "volumetrie/sorties/g01-secours01-essai1",
+  "lignes_lues": 5,
+  "apres_filtre": 5,
+  "zones": {
+    "lignes": 265,
+    "cles_distinctes": 265,
+    "cles_nulles": 0
+  },
+  "non_apparies": 1,
+  "zones_inconnues": [
+    999
+  ],
+  "avant_jointure": 5,
+  "apres_jointure": 4,
+  "partitions": {
+    "trajets_lus": 1,
+    "resultat": 1
+  },
+  "parquet": {
+    "lignes": 3,
+    "somme_nb_trajets": 4
+  },
+  "controle": "ok"
+}

@@ -1,0 +1,43 @@
+## M3 — contrôle qualité
+{"avant": 6, "apres": 5, "rejetees": 1, "rejets_par_regle": {"Q3_distance": 1}, "controle": true}
+
+{
+  "run": "g01-secours01",
+  "mode": "secours_local",
+  "provenance": {
+    "source_repo": "secours_local",
+    "source_revision": "aucune (fichier synthétique)",
+    "source_partition": "volumetrie/secours/trajets_fictifs.jsonl",
+    "extraction": "extraction_g01-secours01.jsonl"
+  },
+  "m2": {
+    "parcourues": 6,
+    "retenues": 6,
+    "rejetees": 0,
+    "motifs_rejet": {}
+  },
+  "regles": {
+    "Q3_distance": "0 < Trip_Distance <= 100 miles",
+    "Q4_duree": "60 <= Trip_Duration <= 21600 s",
+    "Q5_vitesse": "vitesse moyenne <= 80 mph"
+  },
+  "avant": 6,
+  "apres": 5,
+  "rejetees": 1,
+  "rejets_par_regle": {
+    "Q3_distance": 1
+  },
+  "valeurs_manquantes": {
+    "Start_Zone": 0,
+    "Trip_Distance": 0,
+    "Trip_Duration": 0
+  },
+  "controle": true,
+  "fichier_spark": "volumetrie/data/entree_spark_g01-secours01.jsonl"
+}
+## Entrée Spark
+{"rang": 1, "Start_Zone": 1, "Trip_Distance": 2.5, "Trip_Duration": 600, "source_repo": "secours_local", "source_revision": "aucune (fichier synthétique)", "source_partition": "volumetrie/secours/trajets_fictifs.jsonl", "extraction": "extraction_g01-secours01.jsonl"}
+{"rang": 2, "Start_Zone": 4, "Trip_Distance": 3.0, "Trip_Duration": 700, "source_repo": "secours_local", "source_revision": "aucune (fichier synthétique)", "source_partition": "volumetrie/secours/trajets_fictifs.jsonl", "extraction": "extraction_g01-secours01.jsonl"}
+{"rang": 3, "Start_Zone": 4, "Trip_Distance": 1.5, "Trip_Duration": 400, "source_repo": "secours_local", "source_revision": "aucune (fichier synthétique)", "source_partition": "volumetrie/secours/trajets_fictifs.jsonl", "extraction": "extraction_g01-secours01.jsonl"}
+{"rang": 4, "Start_Zone": 7, "Trip_Distance": 4.0, "Trip_Duration": 900, "source_repo": "secours_local", "source_revision": "aucune (fichier synthétique)", "source_partition": "volumetrie/secours/trajets_fictifs.jsonl", "extraction": "extraction_g01-secours01.jsonl"}
+{"rang": 6, "Start_Zone": 999, "Trip_Distance": 1.0, "Trip_Duration": 300, "source_repo": "secours_local", "source_revision": "aucune (fichier synthétique)", "source_partition": "volumetrie/secours/trajets_fictifs.jsonl", "extraction": "extraction_g01-secours01.jsonl"}

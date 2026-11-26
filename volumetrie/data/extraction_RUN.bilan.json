@@ -1,0 +1,27 @@
+{
+  "run": "RUN",
+  "mode": "streaming_distant",
+  "source": {
+    "repo": "DinoPonjevic/NYC_TaxiData",
+    "revision": "5941adbf8c0b9930e47002dc3103de3f9291360d",
+    "partition": "2024/yellow/yellow_tripdata_2024-01.parquet"
+  },
+  "colonnes": [
+    "Start_Zone",
+    "Trip_Distance",
+    "Trip_Duration"
+  ],
+  "borne_max": 50000,
+  "regle_validite": "3 champs présents et non nuls ; Start_Zone entier ; distance et durée numériques finies",
+  "debut": "2026-11-26T11:48:41+00:00",
+  "parcourues": 50000,
+  "retenues": 50000,
+  "rejetees": 0,
+  "motifs_rejet": {},
+  "arret": "borne_atteinte",
+  "statut": "succes",
+  "fin": "2026-11-26T11:48:48+00:00",
+  "duree_s": 6.729,
+  "controle": true,
+  "fichier": "volumetrie\\data\\extraction_RUN.jsonl"
+}

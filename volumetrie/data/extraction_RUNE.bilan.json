@@ -1,0 +1,26 @@
+{
+  "run": "RUNE",
+  "mode": "secours_local",
+  "source": {
+    "fichier": "volumetrie/secours/trajets_fictifs.jsonl",
+    "nature": "synthétique"
+  },
+  "colonnes": [
+    "Start_Zone",
+    "Trip_Distance",
+    "Trip_Duration"
+  ],
+  "borne_max": 50000,
+  "regle_validite": "3 champs présents et non nuls ; Start_Zone entier ; distance et durée numériques finies",
+  "debut": "2026-11-26T11:54:21+00:00",
+  "parcourues": 6,
+  "retenues": 6,
+  "rejetees": 0,
+  "motifs_rejet": {},
+  "arret": "fin_du_flux",
+  "statut": "succes",
+  "fin": "2026-11-26T11:54:22+00:00",
+  "duree_s": 0.598,
+  "controle": true,
+  "fichier": "volumetrie\\data\\extraction_RUNE.jsonl"
+}

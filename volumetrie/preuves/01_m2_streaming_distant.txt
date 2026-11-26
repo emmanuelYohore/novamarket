@@ -1,0 +1,29 @@
+## M2 — tentative distante (révision épinglée, borne 50 000)
+{"mode": "streaming_distant", "statut": "erreur", "arret": "ProxyError: 403 Forbidden (agent proxy: no rule or network setting allows this host)", "parcourues": 0, "retenues": 0, "rejetees": 0, "motifs_rejet": {}, "duree_s": 0.591}
+code retour : 2
+{
+  "run": "g01-distant01",
+  "mode": "streaming_distant",
+  "source": {
+    "repo": "DinoPonjevic/NYC_TaxiData",
+    "revision": "5941adbf8c0b9930e47002dc3103de3f9291360d",
+    "partition": "2024/yellow/yellow_tripdata_2024-01.parquet"
+  },
+  "colonnes": [
+    "Start_Zone",
+    "Trip_Distance",
+    "Trip_Duration"
+  ],
+  "borne_max": 50000,
+  "regle_validite": "3 champs présents et non nuls ; Start_Zone entier ; distance et durée numériques finies",
+  "debut": "2026-11-26T10:39:18+00:00",
+  "parcourues": 0,
+  "retenues": 0,
+  "rejetees": 0,
+  "motifs_rejet": {},
+  "arret": "ProxyError: 403 Forbidden (agent proxy: no rule or network setting allows this host)",
+  "statut": "erreur",
+  "fin": "2026-11-26T10:39:18+00:00",
+  "duree_s": 0.591,
+  "controle": true
+}

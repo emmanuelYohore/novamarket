@@ -1,0 +1,14 @@
+## python --version
+Python 3.12.3
+## java -version
+openjdk version "21.0.13.1" 2026-11-17
+OpenJDK Runtime Environment (build 21.0.13.1+2-1-24.04.1-Ubuntu)
+OpenJDK 64-Bit Server VM (build 21.0.13.1+2-1-24.04.1-Ubuntu, mixed mode, sharing)
+## verifier.py
+Spark local 4.1.1 opérationnel
+## acces.py --infos
+    raise mapped_exc(message) from exc
+httpx.ProxyError: 403 Forbidden (agent proxy: no rule or network setting allows this host)
+## acces.py (streaming)
+    raise mapped_exc(message) from exc
+httpx.ProxyError: 403 Forbidden (agent proxy: no rule or network setting allows this host)

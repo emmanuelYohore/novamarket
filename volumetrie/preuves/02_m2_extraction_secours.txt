@@ -1,0 +1,37 @@
+## M2 — extraction sur le secours local (n'atteste pas le streaming distant)
+{"mode": "secours_local", "statut": "succes", "arret": "fin_du_flux", "parcourues": 6, "retenues": 6, "rejetees": 0, "motifs_rejet": {}, "duree_s": 0.144}
+code retour : 0
+
+{
+  "run": "g01-secours01",
+  "mode": "secours_local",
+  "source": {
+    "fichier": "volumetrie/secours/trajets_fictifs.jsonl",
+    "nature": "synthétique"
+  },
+  "colonnes": [
+    "Start_Zone",
+    "Trip_Distance",
+    "Trip_Duration"
+  ],
+  "borne_max": 50000,
+  "regle_validite": "3 champs présents et non nuls ; Start_Zone entier ; distance et durée numériques finies",
+  "debut": "2026-11-26T10:39:30+00:00",
+  "parcourues": 6,
+  "retenues": 6,
+  "rejetees": 0,
+  "motifs_rejet": {},
+  "arret": "fin_du_flux",
+  "statut": "succes",
+  "fin": "2026-11-26T10:39:31+00:00",
+  "duree_s": 0.144,
+  "controle": true,
+  "fichier": "volumetrie/data/extraction_g01-secours01.jsonl"
+}
+## Extraction
+{"rang": 1, "Start_Zone": 1, "Trip_Distance": 2.5, "Trip_Duration": 600}
+{"rang": 2, "Start_Zone": 4, "Trip_Distance": 3.0, "Trip_Duration": 700}
+{"rang": 3, "Start_Zone": 4, "Trip_Distance": 1.5, "Trip_Duration": 400}
+{"rang": 4, "Start_Zone": 7, "Trip_Distance": 4.0, "Trip_Duration": 900}
+{"rang": 5, "Start_Zone": 7, "Trip_Distance": -2.0, "Trip_Duration": 500}
+{"rang": 6, "Start_Zone": 999, "Trip_Distance": 1.0, "Trip_Duration": 300}

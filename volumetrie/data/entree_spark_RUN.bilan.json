@@ -1,0 +1,36 @@
+{
+  "run": "RUN",
+  "mode": "streaming_distant",
+  "provenance": {
+    "source_repo": "DinoPonjevic/NYC_TaxiData",
+    "source_revision": "5941adbf8c0b9930e47002dc3103de3f9291360d",
+    "source_partition": "2024/yellow/yellow_tripdata_2024-01.parquet",
+    "extraction": "extraction_RUN.jsonl"
+  },
+  "m2": {
+    "parcourues": 50000,
+    "retenues": 50000,
+    "rejetees": 0,
+    "motifs_rejet": {}
+  },
+  "regles": {
+    "Q3_distance": "0 < Trip_Distance <= 100 miles",
+    "Q4_duree": "60 <= Trip_Duration <= 21600 s",
+    "Q5_vitesse": "vitesse moyenne <= 80 mph"
+  },
+  "avant": 50000,
+  "apres": 48680,
+  "rejetees": 1320,
+  "rejets_par_regle": {
+    "Q3_distance": 968,
+    "Q4_duree": 351,
+    "Q5_vitesse": 1
+  },
+  "valeurs_manquantes": {
+    "Start_Zone": 0,
+    "Trip_Distance": 0,
+    "Trip_Duration": 0
+  },
+  "controle": true,
+  "fichier_spark": "volumetrie\\data\\entree_spark_RUN.jsonl"
+}

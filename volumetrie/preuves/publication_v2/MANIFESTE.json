@@ -1,0 +1,19 @@
+{
+  "version": 2,
+  "colonnes": [
+    "zone_id",
+    "arrondissement",
+    "zone",
+    "zone_service",
+    "nb_trajets",
+    "distance_totale_miles",
+    "distance_moy_miles",
+    "duree_moy_min",
+    "vitesse_moy_mph"
+  ],
+  "lignes": 3,
+  "fichiers": {
+    "README.md": "d8856416b5ff6b05c8cae138d9592f2ceee56b5b9536fdfa56afb36327306fd4",
+    "trajets_par_zone.parquet": "cc5f25fca4fcdbff72182a45191cc95244d083da59013afea6ee650f60cf63fb"
+  }
+}
